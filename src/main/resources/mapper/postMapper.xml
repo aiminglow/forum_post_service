@@ -1,0 +1,140 @@
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.aiming.low.forum_post_service.dao.ImmutablePostMapper">
+    <resultMap id="ImmutablePost" type="com.aiming.low.forum_post_service.entity.ImmutablePost">
+        <constructor>
+            <idArg column="post_id" javaType="long"/>
+            <arg column="post_user_id" javaType="long"/>
+            <arg column="post_title" javaType="String"/>
+            <arg column="click_number" javaType="int"/>
+            <arg column="reply_number" javaType="int"/>
+            <arg column="last_reply_time" javaType="java.util.Date"
+                 typeHandler="com.aiming.low.forum_post_service.dao.type_handler.DateIntegerHandler"/>
+            <arg column="last_reply_user_id" javaType="long"/>
+            <arg column="create_time" javaType="java.util.Date"
+                 typeHandler="com.aiming.low.forum_post_service.dao.type_handler.DateIntegerHandler"/>
+            <arg column="delete_time" javaType="java.util.Date"
+                 typeHandler="com.aiming.low.forum_post_service.dao.type_handler.DateIntegerHandler"/>
+            <arg column="post_status" javaType="com.aiming.low.forum_post_service.entity.ThreeStatus"/>
+        </constructor>
+    </resultMap>
+
+    <sql id="baseColumnList">
+        post_id, post_user_id, post_title, click_number, reply_number, last_reply_time, last_reply_user_id, create_time, delete_time, post_status
+    </sql>
+
+    <select id="selectById" parameterType="long" resultMap="ImmutablePost">
+        select
+        <include refid="baseColumnList"/>
+        from post
+        where post_id=#{postId}
+    </select>
+    
+    <select id="selectOrderByIdDesc" parameterType="com.aiming.low.forum_post_service.entity.ImmutablePost" resultMap="ImmutablePost">
+        select
+        <include refid="baseColumnList"/>
+        from post
+        <!-- 目前没有使用where的功能，暂时不实现这部分sql语句 -->
+        order by post_id desc
+    </select>
+
+    <insert id="insert" parameterType="com.aiming.low.forum_post_service.entity.ImmutablePost">
+        insert into post
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="postId != null">
+                post_id,
+            </if>
+            <if test="postUserId != null">
+                post_user_id,
+            </if>
+            <if test="postTitle != null">
+                post_title,
+            </if>
+            <if test="clickNumber != null">
+                click_number,
+            </if>
+            <if test="replyNumber != null">
+                reply_number,
+            </if>
+            <if test="lastReplyTime != null">
+                last_reply_time,
+            </if>
+            <if test="lastReplyUserId != null">
+                last_reply_user_id,
+            </if>
+            <if test="createTime != null">
+                create_time,
+            </if>
+            <if test="postStatus != null">
+                post_status,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="postId != null">
+                #{postId},
+            </if>
+            <if test="postUserId != null">
+                #{postUserId},
+            </if>
+            <if test="postTitle != null">
+                #{postTitle},
+            </if>
+            <if test="clickNumber != null">
+                #{clickNumber},
+            </if>
+            <if test="replyNumber != null">
+                #{replyNumber},
+            </if>
+            <if test="lastReplyTime != null">
+                #{lastReplyTime, typeHandler=com.aiming.low.forum_post_service.dao.type_handler.DateIntegerHandler},
+            </if>
+            <if test="lastReplyUserId != null">
+                #{lastReplyUserId},
+            </if>
+            <if test="createTime != null">
+                #{createTime, typeHandler=com.aiming.low.forum_post_service.dao.type_handler.DateIntegerHandler},
+            </if>
+            <if test="postStatus != null">
+                #{postStatus},
+            </if>
+        </trim>
+    </insert>
+
+    <update id="updateById" parameterType="com.aiming.low.forum_post_service.entity.ImmutablePost">
+        update post
+        <set>
+            <!-- 基本数据类型不能使用null进行判断，要使用0之类的数值进行判断，这该怎么办呢？ -->
+            <if test="postUserId != null">
+                post_user_id = #{postUserId},
+            </if>
+            <if test="postTitle != null">
+                post_title = #{postTitle},
+            </if>
+            <if test="clickNumber != null">
+                click_number = #{clickNumber},
+            </if>
+            <if test="replyNumber != null">
+                reply_number = #{replyNumber},
+            </if>
+            <if test="lastReplyTime != null">
+                last_reply_time = #{lastReplyTime, typeHandler=com.aiming.low.forum_post_service.dao.type_handler.DateIntegerHandler},
+            </if>
+            <if test="lastReplyUserId != null">
+                last_reply_user_id = #{lastReplyUserId},
+            </if>
+            <if test="deleteTime != null">
+                delete_time = #{deleteTime, typeHandler=com.aiming.low.forum_post_service.dao.type_handler.DateIntegerHandler},
+            </if>
+            <if test="postStatus != null">
+                post_status = #{postStatus},
+            </if>
+        </set>
+        where post_id = #{postId}
+    </update>
+
+    <delete id="deleteById" parameterType="long">
+        delete from post
+        where post_id=#{postId}
+    </delete>
+
+</mapper>
